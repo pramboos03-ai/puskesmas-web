@@ -9,7 +9,12 @@ from models import db, User, Pasien, Kunjungan, RekamMedis
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'puskesmas-secret-key-2026-fanta-pink-sik'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///puskesmas.db'
+
+if os.environ.get('VERCEL'):
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/puskesmas.db'
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///puskesmas.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -792,9 +797,15 @@ def profil():
 # MAIN APP RUNNER
 # ==========================================
 
-with app.app_context():
-    db.create_all()
-    seed_database()
+try:
+    with app.app_context():
+        db.create_all()
+        seed_database()
+except Exception as e:
+    print(f"Database init info: {e}")
+
+# Entry point for Vercel / WSGI
+application = app
 
 if __name__ == '__main__':
     print("=" * 65)
