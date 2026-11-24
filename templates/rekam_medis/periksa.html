@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Pemeriksaan Medis - {{ pasien.nama_lengkap }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{{ url_for('kunjungan_list') }}" class="btn btn-sm btn-outline-secondary mb-2">
+    <i class="bi bi-arrow-left me-1"></i>Kembali ke Antrean
+  </a>
+  <h4 class="fw-bold mb-1">Pemeriksaan Dokter & Input Rekam Medis (EMR)</h4>
+  <p class="text-muted small mb-0">Antrean: <strong class="text-fanta-dark">{{ kunjungan.no_antrean }}</strong> | Poli: <span class="badge bg-fanta">{{ kunjungan.poli_tujuan }}</span></p>
+</div>
+
+<!-- INFO PASIEN BANNER -->
+<div class="card-custom bg-fanta-subtle border-0 p-3 mb-4">
+  <div class="row g-3 align-items-center">
+    <div class="col-12 col-md-4">
+      <div class="d-flex align-items-center gap-3">
+        <div class="rounded-circle bg-fanta text-white d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 50px; height: 50px;">
+          {{ pasien.nama_lengkap[0] }}
+        </div>
+        <div>
+          <h5 class="fw-bold mb-0 text-dark">{{ pasien.nama_lengkap }}</h5>
+          <span class="badge bg-fanta">{{ pasien.no_rkm_medis }}</span>
+          <span class="badge bg-secondary ms-1">{{ pasien.umur }} thn ({{ pasien.jenis_kelamin }})</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4">
+      <small class="text-muted d-block">Keluhan Awal Pendaftaran:</small>
+      <span class="fw-semibold text-dark">{{ kunjungan.keluhan_awal or 'Tidak ada keluhan spesifik saat pendaftaran.' }}</span>
+    </div>
+    <div class="col-6 col-md-4 text-md-end">
+      <span class="badge {% if pasien.jenis_pembayaran == 'BPJS' %}badge-bpjs{% else %}badge-umum{% endif %} fs-6 px-3 py-1">
+        {{ pasien.jenis_pembayaran }} {% if pasien.no_bpjs %}({{ pasien.no_bpjs }}){% endif %}
+      </span>
+      <div class="small text-muted mt-1">Dokter: <strong>{{ current_user.nama_lengkap }}</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- FORM PEMERIKSAAN MEDIS -->
+  <div class="col-12 col-xl-8">
+    <div class="card-custom p-4">
+      <form method="POST" action="{{ url_for('rekam_medis_periksa', kunjungan_id=kunjungan.id) }}">
+        
+        <!-- 1. ANAMNESIS -->
+        <h6 class="fw-bold text-fanta-dark border-bottom pb-2 mb-3">
+          <i class="bi bi-chat-left-dots-fill me-2"></i>1. Anamnesis Pasien
+        </h6>
+        
+        <div class="row g-3 mb-4">
+          <div class="col-12">
+            <label for="keluhan_utama" class="form-label">Keluhan Utama (Chief Complaint) <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="keluhan_utama" name="keluhan_utama" rows="3" placeholder="Jelaskan keluhan utama pasien, durasi gejala, dan lokasi rasa sakit..." required>{{ kunjungan.keluhan_awal or '' }}</textarea>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label for="riwayat_penyakit" class="form-label">Riwayat Penyakit Terdahulu / Keluarga</label>
+            <input type="text" class="form-control" id="riwayat_penyakit" name="riwayat_penyakit" placeholder="Contoh: Hipertensi, Asma, Diabetes">
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label for="riwayat_alergi" class="form-label">Riwayat Alergi Obat / Makanan</label>
+            <input type="text" class="form-control" id="riwayat_alergi" name="riwayat_alergi" placeholder="Contoh: Alergi Penisilin, Seafood">
+          </div>
+        </div>
+
+        <!-- 2. PEMERIKSAAN TANDA VITAL (VITAL SIGNS) -->
+        <h6 class="fw-bold text-fanta-dark border-bottom pb-2 mb-3">
+          <i class="bi bi-heart-pulse-fill me-2"></i>2. Pemeriksaan Fisik & Tanda Vital
+        </h6>
+
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-4">
+            <label for="tekanan_darah" class="form-label">Tekanan Darah (TD)</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="tekanan_darah" name="tekanan_darah" placeholder="120/80">
+              <span class="input-group-text small">mmHg</span>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-4">
+            <label for="suhu_tubuh" class="form-label">Suhu Tubuh</label>
+            <div class="input-group">
+              <input type="number" step="0.1" class="form-control" id="suhu_tubuh" name="suhu_tubuh" placeholder="36.5">
+              <span class="input-group-text small">°C</span>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-4">
+            <label for="berat_badan" class="form-label">Berat Badan (BB)</label>
+            <div class="input-group">
+              <input type="number" step="0.1" class="form-control" id="berat_badan" name="berat_badan" placeholder="60">
+              <span class="input-group-text small">kg</span>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-4">
+            <label for="tinggi_badan" class="form-label">Tinggi Badan (TB)</label>
+            <div class="input-group">
+              <input type="number" step="0.5" class="form-control" id="tinggi_badan" name="tinggi_badan" placeholder="165">
+              <span class="input-group-text small">cm</span>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-4">
+            <label for="nadi" class="form-label">Frekuensi Nadi</label>
+            <div class="input-group">
+              <input type="number" class="form-control" id="nadi" name="nadi" placeholder="80">
+              <span class="input-group-text small">bpm</span>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-4">
+            <label for="respirasi" class="form-label">Pernapasan (RR)</label>
+            <div class="input-group">
+              <input type="number" class="form-control" id="respirasi" name="respirasi" placeholder="20">
+              <span class="input-group-text small">x/m</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. DIAGNOSIS MEDIS & ICD-10 -->
+        <h6 class="fw-bold text-fanta-dark border-bottom pb-2 mb-3">
+          <i class="bi bi-file-earmark-medical-fill me-2"></i>3. Diagnosis & Penatalaksanaan
+        </h6>
+
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-md-8">
+            <label for="diagnosis" class="form-label">Diagnosis Medis <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="diagnosis" name="diagnosis" placeholder="Contoh: Infeksi Saluran Pernapasan Akut (ISPA)" required>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <label for="kode_icd10" class="form-label">Kode ICD-10</label>
+            <input type="text" class="form-control font-monospace" id="kode_icd10" name="kode_icd10" placeholder="Contoh: J06.9">
+          </div>
+
+          <div class="col-12">
+            <label for="tindakan_medis" class="form-label">Tindakan Medis / Prosedur</label>
+            <textarea class="form-control" id="tindakan_medis" name="tindakan_medis" rows="2" placeholder="Tindakan medis yang dilakukan (misal: pembersihan luka, nebulizer, kompres hangat, dsb)"></textarea>
+          </div>
+
+          <div class="col-12">
+            <label for="resep_obat" class="form-label">Resep Obat & Terapi (Prescription)</label>
+            <textarea class="form-control font-monospace" id="resep_obat" name="resep_obat" rows="3" placeholder="- Amoxicillin 500mg 3x1 tablet (sesudah makan, habiskan)&#10;- Paracetamol 500mg 3x1 tablet (bila demam)"></textarea>
+          </div>
+
+          <div class="col-12">
+            <label for="catatan_dokter" class="form-label">Catatan Dokter & Edukasi Pasien</label>
+            <textarea class="form-control" id="catatan_dokter" name="catatan_dokter" rows="2" placeholder="Instruksi perawatan di rumah, pantangan, dan jadwal kontrol kembali"></textarea>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+          <a href="{{ url_for('kunjungan_list') }}" class="btn btn-outline-secondary">Batal</a>
+          <button type="submit" class="btn btn-fanta">
+            <i class="bi bi-check2-circle me-1"></i>Selesaikan Pemeriksaan & Simpan EMR
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- RIWAYAT MEDIS SEBELUMNYA (SIDEBAR DOKTER) -->
+  <div class="col-12 col-xl-4">
+    <div class="card-custom p-3">
+      <h6 class="fw-bold text-dark mb-3"><i class="bi bi-clock-history me-1 text-fanta"></i>Riwayat Pemeriksaan Sebelumnya</h6>
+      
+      {% if riwayat_sebelumnya %}
+        <div class="d-flex flex-column gap-3">
+          {% for r in riwayat_sebelumnya %}
+            <div class="p-3 bg-light rounded-3 border">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="badge bg-fanta-subtle text-fanta-dark">{{ r.no_rawat }}</span>
+                <small class="text-muted">{{ r.tanggal_pemeriksaan.strftime('%d/%m/%Y') }}</small>
+              </div>
+              <div class="fw-bold text-dark small mb-1">{{ r.diagnosis }}</div>
+              <div class="small text-muted mb-2">TD: {{ r.tekanan_darah or '-' }} | Suhu: {{ r.suhu_tubuh }}°C</div>
+              <div class="small text-secondary" style="font-size: 0.75rem; white-space: pre-line;">{{ r.resep_obat }}</div>
+              <div class="text-end mt-2">
+                <a href="{{ url_for('rekam_medis_detail', id=r.id) }}" target="_blank" class="text-fanta text-decoration-none small fw-bold">
+                  Lihat Berkas <i class="bi bi-arrow-up-right"></i>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="small text-muted mb-0">Pasien ini belum memiliki catatan rekam medis sebelumnya (Kunjungan Pertama).</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

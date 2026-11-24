@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Data Pasien{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+  <div>
+    <h4 class="fw-bold mb-1">Manajemen Data Pasien</h4>
+    <p class="text-muted small mb-0">Kelola informasi pasien, pencarian rekam medis, dan pendaftaran pasien baru.</p>
+  </div>
+  <a href="{{ url_for('pasien_tambah') }}" class="btn btn-fanta">
+    <i class="bi bi-person-plus-fill me-2"></i>Tambah Pasien Baru
+  </a>
+</div>
+
+<!-- SEARCH & FILTER BAR -->
+<div class="card-custom p-3 mb-4">
+  <form method="GET" action="{{ url_for('pasien_list') }}" class="row g-2 align-items-center">
+    <div class="col-12 col-md-6 col-lg-7">
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0 text-fanta"><i class="bi bi-search"></i></span>
+        <input type="text" name="q" value="{{ query }}" class="form-control border-start-0 ps-0" placeholder="Cari berdasarkan No. RM, NIK, Nama Pasien, atau No. HP...">
+      </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg-3">
+      <select name="jenis_pembayaran" class="form-select">
+        <option value="">Semua Pembayaran</option>
+        <option value="Umum" {% if jenis_pembayaran == 'Umum' %}selected{% endif %}>Umum / Mandiri</option>
+        <option value="BPJS" {% if jenis_pembayaran == 'BPJS' %}selected{% endif %}>BPJS Kesehatan</option>
+      </select>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2 d-flex gap-2">
+      <button type="submit" class="btn btn-fanta w-100">
+        <i class="bi bi-funnel me-1"></i>Filter
+      </button>
+      {% if query or jenis_pembayaran %}
+        <a href="{{ url_for('pasien_list') }}" class="btn btn-outline-secondary" title="Reset Filter">
+          <i class="bi bi-arrow-counterclockwise"></i>
+        </a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<!-- TABLE DATA PASIEN -->
+<div class="card-custom">
+  <div class="table-responsive">
+    <table class="table table-custom table-hover">
+      <thead>
+        <tr>
+          <th>No. RM</th>
+          <th>Nama Pasien & NIK</th>
+          <th>Usia / Kelamin</th>
+          <th>Kontak & Alamat</th>
+          <th>Pembayaran</th>
+          <th class="text-center">Aksi & Pelayanan</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if daftar_pasien %}
+          {% for p in daftar_pasien %}
+            <tr>
+              <td>
+                <span class="badge bg-fanta-subtle fs-6 py-2 px-2 fw-bold">{{ p.no_rkm_medis }}</span>
+              </td>
+              <td>
+                <div class="fw-bold text-dark fs-6">{{ p.nama_lengkap }}</div>
+                <div class="small text-muted font-monospace"><i class="bi bi-card-heading me-1"></i>NIK: {{ p.nik }}</div>
+              </td>
+              <td>
+                <span class="fw-semibold text-dark">{{ p.umur }} thn</span>
+                <span class="text-muted small">({{ 'Laki-laki' if p.jenis_kelamin == 'L' else 'Perempuan' }})</span>
+                <div class="small text-secondary">Gol. Darah: <strong>{{ p.golongan_darah }}</strong></div>
+              </td>
+              <td>
+                <div class="small text-dark"><i class="bi bi-telephone me-1 text-fanta"></i>{{ p.no_hp }}</div>
+                <div class="small text-muted text-truncate" style="max-width: 220px;" title="{{ p.alamat }}">
+                  <i class="bi bi-geo-alt me-1"></i>{{ p.alamat }}
+                </div>
+              </td>
+              <td>
+                {% if p.jenis_pembayaran == 'BPJS' %}
+                  <span class="badge badge-bpjs px-2 py-1"><i class="bi bi-shield-check me-1"></i>BPJS</span>
+                  {% if p.no_bpjs %}
+                    <div class="small text-muted font-monospace" style="font-size: 0.75rem;">{{ p.no_bpjs }}</div>
+                  {% endif %}
+                {% else %}
+                  <span class="badge badge-umum px-2 py-1">Umum</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <div class="d-flex justify-content-center gap-1">
+                  <!-- Daftar ke Antrean Poli -->
+                  <a href="{{ url_for('kunjungan_tambah', pasien_id=p.id) }}" class="btn btn-sm btn-outline-fanta" title="Daftarkan ke Antrean Poli Hari Ini">
+                    <i class="bi bi-plus-circle me-1"></i>Antrean
+                  </a>
+                  <!-- Detail & Riwayat Medis -->
+                  <a href="{{ url_for('pasien_detail', id=p.id) }}" class="btn btn-sm btn-outline-primary" title="Lihat Profil & Riwayat">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <!-- Edit Pasien -->
+                  <a href="{{ url_for('pasien_edit', id=p.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit Data">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <!-- Hapus (khusus admin) -->
+                  {% if current_user.role == 'admin' %}
+                    <form method="POST" action="{{ url_for('pasien_hapus', id=p.id) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pasien {{ p.nama_lengkap }} ({{ p.no_rkm_medis }}) beserta seluruh riwayat kunjungannya?');" style="display:inline;">
+                      <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Pasien">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="6" class="text-center py-5 text-muted">
+              <i class="bi bi-people fs-1 d-block text-secondary opacity-50 mb-2"></i>
+              Tidak ada data pasien yang ditemukan.
+              {% if query or jenis_pembayaran %}
+                <div class="mt-2">
+                  <a href="{{ url_for('pasien_list') }}" class="btn btn-sm btn-outline-fanta">Reset Pencarian</a>
+                </div>
+              {% endif %}
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cetak Rekam Medis - {{ rm.no_rawat }} - {{ rm.pasien.nama_lengkap }}</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <style>
+    body {
+      background-color: #f8fafc;
+      color: #0f172a;
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 12pt;
+    }
+    .print-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 20mm;
+      margin: 20px auto;
+      background: #ffffff;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+    .kop-header {
+      text-align: center;
+      border-bottom: 3px double #000000;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      line-height: 1.25;
+    }
+    .kop-header h4 {
+      margin: 0;
+      font-size: 15pt;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .kop-header h5 {
+      margin: 2px 0;
+      font-size: 13pt;
+      font-weight: bold;
+    }
+    .kop-header p {
+      margin: 0;
+      font-size: 10pt;
+      font-style: italic;
+    }
+    .doc-title {
+      text-align: center;
+      font-size: 13pt;
+      font-weight: bold;
+      text-decoration: underline;
+      margin-bottom: 15px;
+    }
+    .table-bordered-black {
+      border: 1px solid #000000;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    .table-bordered-black th, .table-bordered-black td {
+      border: 1px solid #000000;
+      padding: 6px 10px;
+      font-size: 10.5pt;
+    }
+    .table-bordered-black th {
+      background-color: #f1f5f9;
+      font-weight: bold;
+    }
+    .section-title {
+      font-size: 11pt;
+      font-weight: bold;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      background-color: #f8fafc;
+      padding: 3px 6px;
+      border-left: 3px solid #000;
+    }
+    .rx-box {
+      border: 1px dashed #334155;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 11pt;
+      white-space: pre-line;
+      background: #fafafa;
+    }
+    .ttd-box {
+      margin-top: 35px;
+      float: right;
+      width: 250px;
+      text-align: center;
+    }
+    @media print {
+      body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-sheet {
+        box-shadow: none !important;
+        margin: 0 auto !important;
+        padding: 15mm !important;
+        width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Print Control (No Print) -->
+  <div class="no-print bg-dark py-2 px-3 text-white text-center sticky-top d-flex justify-content-center gap-3 align-items-center shadow">
+    <span>Lembar Siap Cetak (A4)</span>
+    <button onclick="window.print()" class="btn btn-sm btn-danger px-3">
+      <i class="bi bi-printer me-1"></i>Cetak Sekarang (Print / PDF)
+    </button>
+    <a href="{{ url_for('rekam_medis_detail', id=rm.id) }}" class="btn btn-sm btn-outline-light">
+      Kembali
+    </a>
+  </div>
+
+  <div class="print-sheet">
+    
+    <!-- KOP SURAT PUSKESMAS -->
+    <div class="kop-header">
+      <h4>PEMERINTAH KABUPATEN / KOTA</h4>
+      <h5>DINAS KESEHATAN - UPTD PUSKESMAS SEHAT MANDIRI</h5>
+      <p>Jl. Kesehatan Raya No. 10, Kel. Sejahtera, Kec. Pelayanan Sehat | Telp: (021) 889977 | Email: puskesmas@layanan.go.id</p>
+    </div>
+
+    <!-- JUDUL DOKUMEN -->
+    <div class="doc-title">LEMBAR REKAM MEDIS RAWAT JALAN</div>
+    
+    <div class="d-flex justify-content-between mb-3" style="font-size: 10.5pt;">
+      <div>No. Rawat : <strong>{{ rm.no_rawat }}</strong></div>
+      <div>Tanggal / Jam : <strong>{{ rm.tanggal_pemeriksaan.strftime('%d-%m-%Y / %H:%M') }} WIB</strong></div>
+    </div>
+
+    <!-- 1. IDENTITAS PASIEN -->
+    <div class="section-title">I. Identitas Pasien</div>
+    <table class="table-bordered-black">
+      <tr>
+        <td style="width: 25%; font-weight: bold;">No. Rekam Medis</td>
+        <td style="width: 25%;"><strong>{{ rm.pasien.no_rkm_medis }}</strong></td>
+        <td style="width: 25%; font-weight: bold;">Jenis Kelamin</td>
+        <td style="width: 25%;">{{ 'Laki-laki' if rm.pasien.jenis_kelamin == 'L' else 'Perempuan' }}</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold;">Nama Lengkap</td>
+        <td><strong>{{ rm.pasien.nama_lengkap }}</strong></td>
+        <td style="font-weight: bold;">Umur / Tgl Lahir</td>
+        <td>{{ rm.pasien.umur }} Tahun ({{ rm.pasien.tanggal_lahir.strftime('%d-%m-%Y') }})</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold;">NIK KTP</td>
+        <td>{{ rm.pasien.nik }}</td>
+        <td style="font-weight: bold;">Golongan Darah</td>
+        <td>{{ rm.pasien.golongan_darah }}</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold;">Jenis Penjaminan</td>
+        <td>{{ rm.pasien.jenis_pembayaran }} {% if rm.pasien.no_bpjs %}({{ rm.pasien.no_bpjs }}){% endif %}</td>
+        <td style="font-weight: bold;">No. Telepon / HP</td>
+        <td>{{ rm.pasien.no_hp }}</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold;">Alamat Domisili</td>
+        <td colspan="3">{{ rm.pasien.alamat }}</td>
+      </tr>
+    </table>
+
+    <!-- 2. ANAMNESIS -->
+    <div class="section-title">II. Anamnesis (Keluhan & Riwayat)</div>
+    <table class="table-bordered-black">
+      <tr>
+        <td style="width: 25%; font-weight: bold;">Keluhan Utama</td>
+        <td colspan="3">{{ rm.keluhan_utama }}</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold;">Riwayat Penyakit</td>
+        <td>{{ rm.riwayat_penyakit or '-' }}</td>
+        <td style="font-weight: bold;">Riwayat Alergi</td>
+        <td>{{ rm.riwayat_alergi or 'Tidak ada alergi' }}</td>
+      </tr>
+    </table>
+
+    <!-- 3. PEMERIKSAAN FISIK & TANDA VITAL -->
+    <div class="section-title">III. Pemeriksaan Fisik & Tanda Vital</div>
+    <table class="table-bordered-black text-center">
+      <thead>
+        <tr>
+          <th>Tekanan Darah</th>
+          <th>Suhu Tubuh</th>
+          <th>Berat Badan</th>
+          <th>Tinggi Badan</th>
+          <th>Denyut Nadi</th>
+          <th>Laju Nafas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ rm.tekanan_darah or '-' }}</td>
+          <td>{{ rm.suhu_tubuh or '-' }} °C</td>
+          <td>{{ rm.berat_badan or '-' }} kg</td>
+          <td>{{ rm.tinggi_badan or '-' }} cm</td>
+          <td>{{ rm.nadi or '-' }} bpm</td>
+          <td>{{ rm.respirasi or '-' }} x/m</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 4. DIAGNOSIS MEDIS -->
+    <div class="section-title">IV. Diagnosis Klinis (Assesment)</div>
+    <table class="table-bordered-black">
+      <tr>
+        <td style="width: 25%; font-weight: bold;">Diagnosis Utama</td>
+        <td style="width: 50%;"><strong>{{ rm.diagnosis }}</strong></td>
+        <td style="width: 12%; font-weight: bold;">ICD-10</td>
+        <td style="width: 13%;"><strong>{{ rm.kode_icd10 or '-' }}</strong></td>
+      </tr>
+      {% if rm.tindakan_medis %}
+      <tr>
+        <td style="font-weight: bold;">Tindakan Medis</td>
+        <td colspan="3">{{ rm.tindakan_medis }}</td>
+      </tr>
+      {% endif %}
+    </table>
+
+    <!-- 5. TERAPI & RESEP OBAT -->
+    <div class="section-title">V. Terapi / Resep Obat (Planning)</div>
+    <div class="rx-box">
+      <strong>R /</strong>
+      {{ rm.resep_obat or 'Tidak ada resep obat tertulis.' }}
+    </div>
+
+    {% if rm.catatan_dokter %}
+      <div class="mt-2" style="font-size: 10pt;">
+        <strong>Catatan Dokter / Edukasi Pasien:</strong> {{ rm.catatan_dokter }}
+      </div>
+    {% endif %}
+
+    <!-- TANDA TANGAN DOKTER -->
+    <div class="ttd-box">
+      <div style="font-size: 10.5pt;">Kota Layanan, {{ rm.tanggal_pemeriksaan.strftime('%d %B %Y') }}</div>
+      <div style="font-size: 10.5pt; margin-bottom: 60px;">Dokter Pemeriksa,</div>
+      <div style="font-weight: bold; text-decoration: underline;">
+        {{ rm.dokter.nama_lengkap if rm.dokter else 'dr. Siti Rahmawati, Sp.PK' }}
+      </div>
+      <div style="font-size: 9.5pt;">SIP: 446/SIP.DOKTER/2026</div>
+    </div>
+
+    <div style="clear: both;"></div>
+
+  </div>
+
+</body>
+</html>

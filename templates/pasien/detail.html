@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block title %}Profil Pasien - {{ pasien.nama_lengkap }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3 no-print">
+  <div>
+    <a href="{{ url_for('pasien_list') }}" class="btn btn-sm btn-outline-secondary mb-2">
+      <i class="bi bi-arrow-left me-1"></i>Kembali ke Data Pasien
+    </a>
+    <h4 class="fw-bold mb-1">{{ pasien.nama_lengkap }}</h4>
+    <p class="text-muted small mb-0">Nomor Rekam Medis: <strong class="text-fanta-dark">{{ pasien.no_rkm_medis }}</strong></p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('kunjungan_tambah', pasien_id=pasien.id) }}" class="btn btn-fanta">
+      <i class="bi bi-plus-circle me-1"></i>Daftarkan ke Antrean Poli
+    </a>
+    <a href="{{ url_for('pasien_edit', id=pasien.id) }}" class="btn btn-outline-secondary">
+      <i class="bi bi-pencil me-1"></i>Edit Data
+    </a>
+    <button onclick="window.print()" class="btn btn-outline-dark">
+      <i class="bi bi-printer me-1"></i>Cetak Kartu
+    </button>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- IDENTITAS PASIEN CARD -->
+  <div class="col-12 col-lg-4">
+    <div class="card-custom p-4 mb-4">
+      <div class="text-center pb-3 border-bottom mb-3">
+        <div class="rounded-circle bg-fanta text-white d-inline-flex align-items-center justify-content-center mb-3 shadow" style="width: 72px; height: 72px; font-size: 2rem; font-weight: 800;">
+          {{ pasien.nama_lengkap[0] }}
+        </div>
+        <h5 class="fw-bold mb-1">{{ pasien.nama_lengkap }}</h5>
+        <span class="badge bg-fanta-subtle fs-6 py-2 px-3 fw-bold">{{ pasien.no_rkm_medis }}</span>
+      </div>
+
+      <div class="small">
+        <div class="d-flex justify-content-between py-2 border-bottom">
+          <span class="text-muted">NIK</span>
+          <span class="fw-semibold text-dark font-monospace">{{ pasien.nik }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2 border-bottom">
+          <span class="text-muted">Usia / Tgl Lahir</span>
+          <span class="fw-semibold text-dark">{{ pasien.umur }} thn ({{ pasien.tanggal_lahir.strftime('%d-%m-%Y') }})</span>
+        </div>
+        <div class="d-flex justify-content-between py-2 border-bottom">
+          <span class="text-muted">Jenis Kelamin</span>
+          <span class="fw-semibold text-dark">{{ 'Laki-laki' if pasien.jenis_kelamin == 'L' else 'Perempuan' }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2 border-bottom">
+          <span class="text-muted">Golongan Darah</span>
+          <span class="fw-semibold text-dark">{{ pasien.golongan_darah }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2 border-bottom">
+          <span class="text-muted">No. Telepon / WA</span>
+          <span class="fw-semibold text-dark">{{ pasien.no_hp }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2 border-bottom">
+          <span class="text-muted">Jenis Pembayaran</span>
+          <div>
+            {% if pasien.jenis_pembayaran == 'BPJS' %}
+              <span class="badge badge-bpjs">BPJS Kesehatan</span>
+              <div class="text-end small text-muted font-monospace mt-1">{{ pasien.no_bpjs }}</div>
+            {% else %}
+              <span class="badge badge-umum">Umum</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="py-2">
+          <span class="text-muted d-block mb-1">Alamat Domisili:</span>
+          <div class="p-2 bg-light rounded text-dark">{{ pasien.alamat }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIWAYAT REKAM MEDIS & KUNJUNGAN -->
+  <div class="col-12 col-lg-8">
+    
+    <!-- Tab Nav -->
+    <ul class="nav nav-pills mb-3 gap-2" id="pasienTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active rounded-pill px-4" id="rm-tab" data-bs-toggle="tab" data-bs-target="#tab-rm" type="button" role="tab">
+          <i class="bi bi-clipboard2-pulse me-1"></i>Riwayat Rekam Medis ({{ riwayat_rm|length }})
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-pill px-4" id="kunjungan-tab" data-bs-toggle="tab" data-bs-target="#tab-kunjungan" type="button" role="tab">
+          <i class="bi bi-calendar-event me-1"></i>Riwayat Kunjungan ({{ riwayat_kunjungan|length }})
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="pasienTabContent">
+      
+      <!-- TAB 1: RIWAYAT REKAM MEDIS -->
+      <div class="tab-pane fade show active" id="tab-rm" role="tabpanel">
+        {% if riwayat_rm %}
+          <div class="d-flex flex-column gap-3">
+            {% for rm in riwayat_rm %}
+              <div class="card-custom p-3 p-md-4">
+                <div class="d-flex justify-content-between align-items-start border-bottom pb-2 mb-3">
+                  <div>
+                    <span class="badge bg-fanta-subtle fw-bold text-fanta-dark me-2">{{ rm.no_rawat }}</span>
+                    <span class="small text-muted"><i class="bi bi-clock me-1"></i>{{ rm.tanggal_pemeriksaan.strftime('%d %B %Y, %H:%M') }}</span>
+                  </div>
+                  <div>
+                    <a href="{{ url_for('rekam_medis_detail', id=rm.id) }}" class="btn btn-sm btn-outline-fanta">
+                      <i class="bi bi-eye me-1"></i>Detail EMR
+                    </a>
+                    <a href="{{ url_for('rekam_medis_cetak', id=rm.id) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                      <i class="bi bi-printer"></i>
+                    </a>
+                  </div>
+                </div>
+
+                <div class="row g-2 mb-2">
+                  <div class="col-12 col-md-6">
+                    <small class="text-muted d-block">Diagnosis Medis:</small>
+                    <span class="fw-bold text-dark">{{ rm.diagnosis }}</span>
+                    {% if rm.kode_icd10 %}
+                      <span class="badge bg-secondary ms-1">{{ rm.kode_icd10 }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <small class="text-muted d-block">Dokter Pemeriksa:</small>
+                    <span class="fw-semibold text-dark">{{ rm.dokter.nama_lengkap if rm.dokter else 'Dokter Jaga' }}</span>
+                  </div>
+                </div>
+
+                <!-- Tanda Vital -->
+                <div class="p-2 bg-light rounded d-flex flex-wrap gap-3 small mb-2 text-dark">
+                  <div>TD: <strong>{{ rm.tekanan_darah or '-' }}</strong></div>
+                  <div>Suhu: <strong>{{ rm.suhu_tubuh }} °C</strong></div>
+                  <div>BB: <strong>{{ rm.berat_badan }} kg</strong></div>
+                  <div>TB: <strong>{{ rm.tinggi_badan }} cm</strong></div>
+                  <div>Nadi: <strong>{{ rm.nadi }} bpm</strong></div>
+                </div>
+
+                <div class="small">
+                  <span class="text-muted">Resep Obat / Terapi:</span>
+                  <div class="text-dark font-monospace bg-white p-2 rounded border mt-1" style="white-space: pre-line;">{{ rm.resep_obat or '-' }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="card-custom p-5 text-center text-muted">
+            <i class="bi bi-folder-x fs-1 d-block text-secondary opacity-50 mb-2"></i>
+            Pasien ini belum memiliki catatan rekam medis.
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- TAB 2: RIWAYAT KUNJUNGAN -->
+      <div class="tab-pane fade" id="tab-kunjungan" role="tabpanel">
+        <div class="card-custom">
+          <div class="table-responsive">
+            <table class="table table-custom table-hover">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>No. Antrean</th>
+                  <th>Poli</th>
+                  <th>Keluhan Awal</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if riwayat_kunjungan %}
+                  {% for k in riwayat_kunjungan %}
+                    <tr>
+                      <td class="small fw-semibold text-dark">{{ k.tanggal_kunjungan.strftime('%d-%m-%Y') }}</td>
+                      <td><span class="fw-bold text-fanta-dark">{{ k.no_antrean }}</span></td>
+                      <td><span class="badge bg-fanta-subtle">{{ k.poli_tujuan }}</span></td>
+                      <td class="small text-muted">{{ k.keluhan_awal or '-' }}</td>
+                      <td>
+                        {% if k.status == 'Menunggu' %}
+                          <span class="badge badge-menunggu">Menunggu</span>
+                        {% elif k.status == 'Diperiksa' %}
+                          <span class="badge badge-diperiksa">Diperiksa</span>
+                        {% elif k.status == 'Selesai' %}
+                          <span class="badge badge-selesai">Selesai</span>
+                        {% else %}
+                          <span class="badge badge-batal">Batal</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        <a href="{{ url_for('kunjungan_cetak', id=k.id) }}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Cetak Tiket">
+                          <i class="bi bi-printer"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">Belum ada riwayat kunjungan.</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

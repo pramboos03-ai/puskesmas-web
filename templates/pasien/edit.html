@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Data Pasien{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{{ url_for('pasien_detail', id=pasien.id) }}" class="btn btn-sm btn-outline-secondary mb-2">
+    <i class="bi bi-arrow-left me-1"></i>Kembali ke Detail Pasien
+  </a>
+  <h4 class="fw-bold mb-1">Perbarui Data Pasien</h4>
+  <p class="text-muted small mb-0">Ubah data identitas untuk berkas rekam medis: <strong>{{ pasien.no_rkm_medis }}</strong></p>
+</div>
+
+<div class="row">
+  <div class="col-12 col-xl-9">
+    <div class="card-custom p-4">
+      <form method="POST" action="{{ url_for('pasien_edit', id=pasien.id) }}">
+        
+        <div class="row g-3">
+          <!-- No RM (Readonly) -->
+          <div class="col-12 col-md-6">
+            <label class="form-label">Nomor Rekam Medis (Tetap)</label>
+            <input type="text" class="form-control bg-light" value="{{ pasien.no_rkm_medis }}" disabled>
+          </div>
+
+          <!-- NIK -->
+          <div class="col-12 col-md-6">
+            <label for="nik" class="form-label">NIK (Nomor Induk Kependudukan) <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="nik" name="nik" value="{{ pasien.nik }}" maxlength="16" required>
+          </div>
+
+          <!-- Nama Lengkap -->
+          <div class="col-12 col-md-6">
+            <label for="nama_lengkap" class="form-label">Nama Lengkap Pasien <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" value="{{ pasien.nama_lengkap }}" required>
+          </div>
+
+          <!-- Tempat Lahir -->
+          <div class="col-12 col-md-3">
+            <label for="tempat_lahir" class="form-label">Tempat Lahir</label>
+            <input type="text" class="form-control" id="tempat_lahir" name="tempat_lahir" value="{{ pasien.tempat_lahir or '' }}">
+          </div>
+
+          <!-- Tanggal Lahir -->
+          <div class="col-12 col-md-3">
+            <label for="tanggal_lahir" class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="tanggal_lahir" name="tanggal_lahir" value="{{ pasien.tanggal_lahir.strftime('%Y-%m-%d') }}" required>
+          </div>
+
+          <!-- Jenis Kelamin -->
+          <div class="col-12 col-md-4">
+            <label class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
+            <div class="d-flex gap-3 pt-1">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="jenis_kelamin" id="jk_l" value="L" {% if pasien.jenis_kelamin == 'L' %}checked{% endif %}>
+                <label class="form-check-label" for="jk_l">Laki-laki</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="jenis_kelamin" id="jk_p" value="P" {% if pasien.jenis_kelamin == 'P' %}checked{% endif %}>
+                <label class="form-check-label" for="jk_p">Perempuan</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Golongan Darah -->
+          <div class="col-12 col-md-4">
+            <label for="golongan_darah" class="form-label">Golongan Darah</label>
+            <select class="form-select" id="golongan_darah" name="golongan_darah">
+              <option value="-" {% if pasien.golongan_darah == '-' %}selected{% endif %}>- Tidak Tahu -</option>
+              <option value="A" {% if pasien.golongan_darah == 'A' %}selected{% endif %}>A</option>
+              <option value="B" {% if pasien.golongan_darah == 'B' %}selected{% endif %}>B</option>
+              <option value="AB" {% if pasien.golongan_darah == 'AB' %}selected{% endif %}>AB</option>
+              <option value="O" {% if pasien.golongan_darah == 'O' %}selected{% endif %}>O</option>
+            </select>
+          </div>
+
+          <!-- No. HP -->
+          <div class="col-12 col-md-4">
+            <label for="no_hp" class="form-label">No. Telepon / WhatsApp <span class="text-danger">*</span></label>
+            <input type="tel" class="form-control" id="no_hp" name="no_hp" value="{{ pasien.no_hp }}" required>
+          </div>
+
+          <!-- Alamat Lengkap -->
+          <div class="col-12">
+            <label for="alamat" class="form-label">Alamat Domisili <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="alamat" name="alamat" rows="2" required>{{ pasien.alamat }}</textarea>
+          </div>
+
+          <!-- Pembayaran -->
+          <div class="col-12 col-md-6">
+            <label for="jenis_pembayaran" class="form-label">Jenis Pembayaran <span class="text-danger">*</span></label>
+            <select class="form-select" id="jenis_pembayaran" name="jenis_pembayaran" onchange="toggleBpjsField()">
+              <option value="Umum" {% if pasien.jenis_pembayaran == 'Umum' %}selected{% endif %}>Umum / Mandiri</option>
+              <option value="BPJS" {% if pasien.jenis_pembayaran == 'BPJS' %}selected{% endif %}>BPJS Kesehatan</option>
+            </select>
+          </div>
+
+          <!-- Nomor BPJS -->
+          <div class="col-12 col-md-6" id="bpjsField" style="display: {% if pasien.jenis_pembayaran == 'BPJS' %}block{% else %}none{% endif %};">
+            <label for="no_bpjs" class="form-label">Nomor Kartu BPJS</label>
+            <input type="text" class="form-control" id="no_bpjs" name="no_bpjs" value="{{ pasien.no_bpjs or '' }}" placeholder="Nomor Kartu BPJS Kesehatan">
+          </div>
+
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+          <a href="{{ url_for('pasien_detail', id=pasien.id) }}" class="btn btn-outline-secondary">Batal</a>
+          <button type="submit" class="btn btn-fanta">
+            <i class="bi bi-check-lg me-1"></i>Simpan Perubahan
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function toggleBpjsField() {
+    const bayarSelect = document.getElementById('jenis_pembayaran');
+    const bpjsField = document.getElementById('bpjsField');
+    if (bayarSelect.value === 'BPJS') {
+      bpjsField.style.display = 'block';
+    } else {
+      bpjsField.style.display = 'none';
+    }
+  }
+</script>
+{% endblock %}

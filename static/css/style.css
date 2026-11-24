@@ -1,0 +1,496 @@
+/* ==========================================================================
+   SISTEM INFORMASI KESEHATAN PUSKESMAS (SIK PUSKESMAS)
+   Theme: Pink Fanta (#E91E63 / #FF1493) & Modern Clean White (#FFFFFF / #FFF5F8)
+   ========================================================================== */
+
+:root {
+  --fanta-primary: #E91E63;
+  --fanta-dark: #C2185B;
+  --fanta-light: #FF4081;
+  --fanta-deep: #AD1457;
+  --fanta-subtle: #FCE4EC;
+  --fanta-bg: #FFF5F8;
+  --fanta-border: #F8BBD0;
+  --fanta-glow: rgba(233, 30, 99, 0.25);
+  
+  --body-bg: #FCF9FA;
+  --card-bg: #FFFFFF;
+  --text-main: #1E293B;
+  --text-muted: #64748B;
+  
+  --sidebar-width: 260px;
+  --topbar-height: 70px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--body-bg);
+  color: var(--text-main);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* ============================
+   TYPOGRAPHY & ACCENTS
+   ============================ */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: #0F172A;
+  letter-spacing: -0.02em;
+}
+
+.text-fanta {
+  color: var(--fanta-primary) !important;
+}
+
+.text-fanta-dark {
+  color: var(--fanta-dark) !important;
+}
+
+.bg-fanta {
+  background-color: var(--fanta-primary) !important;
+  color: #ffffff;
+}
+
+.bg-fanta-subtle {
+  background-color: var(--fanta-bg) !important;
+  color: var(--fanta-dark) !important;
+}
+
+/* ============================
+   BUTTONS
+   ============================ */
+.btn-fanta {
+  background: linear-gradient(135deg, var(--fanta-primary) 0%, var(--fanta-dark) 100%);
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  padding: 0.55rem 1.25rem;
+  border-radius: 0.6rem;
+  box-shadow: 0 4px 12px var(--fanta-glow);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-fanta:hover, .btn-fanta:focus {
+  background: linear-gradient(135deg, var(--fanta-light) 0%, var(--fanta-primary) 100%);
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(233, 30, 99, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-outline-fanta {
+  background-color: transparent;
+  color: var(--fanta-primary);
+  border: 1.5px solid var(--fanta-primary);
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  border-radius: 0.6rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-fanta:hover {
+  background-color: var(--fanta-primary);
+  color: #ffffff;
+  border-color: var(--fanta-primary);
+  box-shadow: 0 4px 12px var(--fanta-glow);
+}
+
+/* ============================
+   SIDEBAR & LAYOUT
+   ============================ */
+.app-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-sidebar {
+  width: var(--sidebar-width);
+  background: linear-gradient(180deg, #E91E63 0%, #AD1457 100%);
+  color: #FFFFFF;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1040;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 20px rgba(173, 20, 87, 0.15);
+  transition: all 0.3s ease;
+}
+
+.sidebar-brand {
+  padding: 1.5rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.brand-icon {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.brand-text h5 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #FFFFFF;
+}
+
+.brand-text span {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+
+.sidebar-menu {
+  flex: 1;
+  padding: 1.25rem 0.85rem;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+}
+
+.sidebar-heading {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 1px;
+  padding: 0.75rem 0.75rem 0.35rem;
+}
+
+.nav-item {
+  margin-bottom: 0.3rem;
+}
+
+.nav-link-custom {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0.95rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 500;
+  font-size: 0.92rem;
+  border-radius: 0.65rem;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-link-custom i {
+  font-size: 1.2rem;
+}
+
+.nav-link-custom:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+.nav-link-custom.active {
+  background: #ffffff;
+  color: var(--fanta-dark);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.sidebar-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* ============================
+   MAIN CONTENT & TOPBAR
+   ============================ */
+.app-main {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.app-topbar {
+  height: var(--topbar-height);
+  background: #ffffff;
+  border-bottom: 1px solid #F1E5E9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+
+.app-content {
+  padding: 1.75rem 2rem 3rem;
+  flex: 1;
+}
+
+/* ============================
+   CARDS & STATS
+   ============================ */
+.card-custom {
+  background: var(--card-bg);
+  border: 1px solid #F3E6EA;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(233, 30, 99, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-custom:hover {
+  box-shadow: 0 6px 24px rgba(233, 30, 99, 0.08);
+}
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  padding: 1.4rem;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--fanta-primary);
+  border-radius: 4px 0 0 4px;
+}
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: var(--fanta-bg);
+  color: var(--fanta-primary);
+}
+
+.stat-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ============================
+   BADGES & STATUS
+   ============================ */
+.badge-menunggu {
+  background-color: #FEF3C7;
+  color: #B45309;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+}
+
+.badge-diperiksa {
+  background-color: #E0F2FE;
+  color: #0369A1;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+}
+
+.badge-selesai {
+  background-color: #DCFCE7;
+  color: #15803D;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+}
+
+.badge-batal {
+  background-color: #F1F5F9;
+  color: #64748B;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+}
+
+.badge-bpjs {
+  background-color: #E0F2FE;
+  color: #0284C7;
+  border: 1px solid #BAE6FD;
+  font-weight: 600;
+}
+
+.badge-umum {
+  background-color: #FFF1F2;
+  color: #E11D48;
+  border: 1px solid #FECDD3;
+  font-weight: 600;
+}
+
+/* ============================
+   TABLES
+   ============================ */
+.table-custom {
+  margin-bottom: 0;
+}
+
+.table-custom thead th {
+  background-color: var(--fanta-bg);
+  color: var(--fanta-dark);
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--fanta-border);
+  padding: 0.85rem 1rem;
+}
+
+.table-custom tbody td {
+  padding: 0.9rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #F1E5E9;
+  font-size: 0.9rem;
+}
+
+.table-custom tbody tr:hover {
+  background-color: #FFF8FA;
+}
+
+/* ============================
+   FORMS & INPUTS
+   ============================ */
+.form-label {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #334155;
+  margin-bottom: 0.4rem;
+}
+
+.form-control, .form-select {
+  border-radius: 0.6rem;
+  border: 1.5px solid #E2E8F0;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.92rem;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--fanta-primary);
+  box-shadow: 0 0 0 0.2rem rgba(233, 30, 99, 0.15);
+}
+
+/* ============================
+   LOGIN PAGE SPECIFIC
+   ============================ */
+.login-body {
+  background: radial-gradient(circle at 10% 20%, #FFF0F5 0%, #FFFFFF 90%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.login-card {
+  background: #ffffff;
+  border-radius: 1.25rem;
+  box-shadow: 0 15px 35px rgba(233, 30, 99, 0.12);
+  border: 1px solid #F8BBD0;
+  overflow: hidden;
+  max-width: 480px;
+  width: 100%;
+}
+
+.login-header {
+  background: linear-gradient(135deg, var(--fanta-primary) 0%, var(--fanta-dark) 100%);
+  color: #ffffff;
+  padding: 2.25rem 2rem;
+  text-align: center;
+}
+
+/* ============================
+   PRINT STYLES FOR REKAM MEDIS & TIKET
+   ============================ */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+  }
+
+  .no-print, .app-sidebar, .app-topbar, .btn, .alert {
+    display: none !important;
+  }
+
+  .app-main {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  .app-content {
+    padding: 0 !important;
+  }
+
+  .card-custom {
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .print-header {
+    border-bottom: 3px double #000;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+  }
+
+  .print-page {
+    width: 100%;
+    margin: 0;
+    padding: 15mm;
+  }
+}
+
+/* ============================
+   RESPONSIVE MOBILE
+   ============================ */
+@media (max-width: 991.98px) {
+  .app-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .app-sidebar.show {
+    transform: translateX(0);
+  }
+
+  .app-main {
+    margin-left: 0;
+  }
+
+  .app-topbar {
+    padding: 0 1rem;
+  }
+
+  .app-content {
+    padding: 1rem;
+  }
+}

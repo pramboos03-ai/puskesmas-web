@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Pendaftaran Kunjungan & Antrean Poli{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{{ url_for('kunjungan_list') }}" class="btn btn-sm btn-outline-secondary mb-2">
+    <i class="bi bi-arrow-left me-1"></i>Kembali ke Antrean
+  </a>
+  <h4 class="fw-bold mb-1">Pendaftaran Kunjungan Poli Hari Ini</h4>
+  <p class="text-muted small mb-0">Pilih data pasien dan tentukan poli klinik tujuan untuk mendapatkan nomor antrean otomatis.</p>
+</div>
+
+<div class="row">
+  <div class="col-12 col-xl-8">
+    <div class="card-custom p-4">
+      <form method="POST" action="{{ url_for('kunjungan_tambah') }}">
+
+        <!-- PILIH PASIEN -->
+        <div class="mb-4">
+          <label for="pasien_id" class="form-label">Pilih Pasien Terdaftar <span class="text-danger">*</span></label>
+          
+          {% if pasien_terpilih %}
+            <!-- Pasien sudah terpilih dari halaman sebelumnya -->
+            <input type="hidden" name="pasien_id" value="{{ pasien_terpilih.id }}">
+            <div class="card bg-fanta-subtle border-0 p-3 rounded-3 d-flex flex-row align-items-center justify-content-between">
+              <div>
+                <span class="badge bg-fanta mb-1">{{ pasien_terpilih.no_rkm_medis }}</span>
+                <h5 class="fw-bold text-dark mb-0">{{ pasien_terpilih.nama_lengkap }}</h5>
+                <small class="text-muted">NIK: {{ pasien_terpilih.nik }} | Usia: {{ pasien_terpilih.umur }} thn | {{ pasien_terpilih.jenis_pembayaran }}</small>
+              </div>
+              <a href="{{ url_for('kunjungan_tambah') }}" class="btn btn-sm btn-outline-fanta">Ganti Pasien</a>
+            </div>
+          {% else %}
+            <!-- Pilih dari dropdown semua pasien -->
+            <select name="pasien_id" id="pasien_id" class="form-select" required>
+              <option value="">-- Cari / Pilih Pasien --</option>
+              {% for p in daftar_pasien %}
+                <option value="{{ p.id }}">
+                  {{ p.no_rkm_medis }} - {{ p.nama_lengkap }} (NIK: {{ p.nik }}) [{{ p.jenis_pembayaran }}]
+                </option>
+              {% endfor %}
+            </select>
+            <div class="mt-2 text-muted small">
+              Pasien belum terdaftar? <a href="{{ url_for('pasien_tambah') }}" class="text-fanta fw-bold">Daftarkan Pasien Baru di Sini</a>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="row g-3">
+          <!-- TANGGAL KUNJUNGAN -->
+          <div class="col-12 col-md-6">
+            <label for="tanggal_kunjungan" class="form-label">Tanggal Pelayanan <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="tanggal_kunjungan" name="tanggal_kunjungan" value="{{ today }}" required>
+          </div>
+
+          <!-- POLI TUJUAN -->
+          <div class="col-12 col-md-6">
+            <label for="poli_tujuan" class="form-label">Poli Klinik Tujuan <span class="text-danger">*</span></label>
+            <select class="form-select" id="poli_tujuan" name="poli_tujuan" required>
+              {% for p in poli_list %}
+                <option value="{{ p }}">{{ p }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- KELUHAN AWAL -->
+          <div class="col-12">
+            <label for="keluhan_awal" class="form-label">Keluhan Utama / Alasan Kunjungan</label>
+            <textarea class="form-control" id="keluhan_awal" name="keluhan_awal" rows="3" placeholder="Contoh: Demam tinggi 2 hari, batuk pilek, pusing..."></textarea>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+          <a href="{{ url_for('kunjungan_list') }}" class="btn btn-outline-secondary">Batal</a>
+          <button type="submit" class="btn btn-fanta">
+            <i class="bi bi-printer me-1"></i>Daftarkan & Cetak Tiket
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-4 mt-4 mt-xl-0">
+    <div class="card-custom p-4 bg-fanta-subtle border-0">
+      <h6 class="fw-bold text-fanta-dark mb-3"><i class="bi bi-info-circle me-1"></i>Informasi Kode Antrean Poli</h6>
+      <div class="d-flex flex-column gap-2 small">
+        <div class="d-flex justify-content-between p-2 bg-white rounded">
+          <span>Poli Umum</span>
+          <span class="badge bg-fanta">Kode: U</span>
+        </div>
+        <div class="d-flex justify-content-between p-2 bg-white rounded">
+          <span>Poli Gigi</span>
+          <span class="badge bg-fanta">Kode: G</span>
+        </div>
+        <div class="d-flex justify-content-between p-2 bg-white rounded">
+          <span>Poli KIA / KB</span>
+          <span class="badge bg-fanta">Kode: K</span>
+        </div>
+        <div class="d-flex justify-content-between p-2 bg-white rounded">
+          <span>Poli Lansia</span>
+          <span class="badge bg-fanta">Kode: L</span>
+        </div>
+        <div class="d-flex justify-content-between p-2 bg-white rounded">
+          <span>Poli Anak</span>
+          <span class="badge bg-fanta">Kode: A</span>
+        </div>
+      </div>
+      <p class="small text-muted mt-3 mb-0">
+        Nomor urut antrean secara otomatis akan di-reset setiap hari sesuai tanggal kunjungan.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

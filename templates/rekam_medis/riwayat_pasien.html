@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Riwayat Rekam Medis - {{ pasien.nama_lengkap }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3 no-print">
+  <div>
+    <a href="{{ url_for('pasien_detail', id=pasien.id) }}" class="btn btn-sm btn-outline-secondary mb-2">
+      <i class="bi bi-arrow-left me-1"></i>Kembali ke Detail Pasien
+    </a>
+    <h4 class="fw-bold mb-1">Riwayat Lengkap Rekam Medis Pasien</h4>
+    <p class="text-muted small mb-0">{{ pasien.nama_lengkap }} | No. RM: <strong class="text-fanta-dark">{{ pasien.no_rkm_medis }}</strong></p>
+  </div>
+  <button onclick="window.print()" class="btn btn-fanta">
+    <i class="bi bi-printer me-1"></i>Cetak Riwayat Pasien
+  </button>
+</div>
+
+<!-- INFO HEADER PASIEN (TAMPIL DI CETAK JUGA) -->
+<div class="card-custom p-4 mb-4">
+  <div class="row g-3">
+    <div class="col-12 col-md-4">
+      <span class="small text-muted d-block">Nama Lengkap:</span>
+      <h5 class="fw-bold text-dark mb-0">{{ pasien.nama_lengkap }}</h5>
+      <span class="badge bg-fanta mt-1">{{ pasien.no_rkm_medis }}</span>
+    </div>
+    <div class="col-6 col-md-3">
+      <span class="small text-muted d-block">NIK & Tanggal Lahir:</span>
+      <strong class="text-dark font-monospace">{{ pasien.nik }}</strong>
+      <div class="small text-muted">{{ pasien.tanggal_lahir.strftime('%d-%m-%Y') }} ({{ pasien.umur }} tahun)</div>
+    </div>
+    <div class="col-6 col-md-2">
+      <span class="small text-muted d-block">Jenis Kelamin:</span>
+      <strong class="text-dark">{{ 'Laki-laki' if pasien.jenis_kelamin == 'L' else 'Perempuan' }}</strong>
+      <div class="small text-muted">Gol. Darah: {{ pasien.golongan_darah }}</div>
+    </div>
+    <div class="col-12 col-md-3">
+      <span class="small text-muted d-block">Alamat Domisili:</span>
+      <span class="small text-dark">{{ pasien.alamat }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- KRONOLOGIS RIWAYAT REKAM MEDIS -->
+<div class="d-flex flex-column gap-4">
+  {% if riwayat_rm %}
+    {% for rm in riwayat_rm %}
+      <div class="card-custom p-4">
+        
+        <!-- Header Rawat -->
+        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+          <div>
+            <span class="badge bg-fanta fs-6 px-3 py-1">{{ rm.no_rawat }}</span>
+            <span class="ms-2 fw-semibold text-dark"><i class="bi bi-calendar3 me-1"></i>{{ rm.tanggal_pemeriksaan.strftime('%A, %d %B %Y - %H:%M') }} WIB</span>
+          </div>
+          <div class="text-end">
+            <span class="small text-muted">Dokter: </span>
+            <strong class="text-fanta-dark">{{ rm.dokter.nama_lengkap if rm.dokter else 'Dokter Jaga' }}</strong>
+            <a href="{{ url_for('rekam_medis_cetak', id=rm.id) }}" target="_blank" class="btn btn-sm btn-outline-secondary ms-2 no-print">
+              <i class="bi bi-printer"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <!-- Anamnesis & Diagnosis -->
+          <div class="col-12 col-lg-6">
+            <div class="mb-3">
+              <span class="text-muted small d-block">Keluhan Utama:</span>
+              <div class="fw-semibold text-dark">{{ rm.keluhan_utama }}</div>
+            </div>
+
+            <div class="p-3 bg-fanta-subtle rounded-3 mb-3">
+              <span class="small text-fanta-dark fw-bold d-block">Diagnosis Medis:</span>
+              <h6 class="fw-bold text-fanta-dark mb-0">{{ rm.diagnosis }}</h6>
+              {% if rm.kode_icd10 %}
+                <span class="badge bg-secondary mt-1">ICD-10: {{ rm.kode_icd10 }}</span>
+              {% endif %}
+            </div>
+
+            {% if rm.tindakan_medis %}
+              <div>
+                <span class="text-muted small d-block">Tindakan Medis:</span>
+                <p class="mb-0 text-dark small">{{ rm.tindakan_medis }}</p>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Tanda Vital & Resep -->
+          <div class="col-12 col-lg-6">
+            <!-- Tanda Vital -->
+            <div class="p-2 bg-light rounded d-flex flex-wrap gap-2 small mb-3 text-dark">
+              <div class="me-2">TD: <strong>{{ rm.tekanan_darah or '-' }}</strong></div>
+              <div class="me-2">Suhu: <strong>{{ rm.suhu_tubuh }}°C</strong></div>
+              <div class="me-2">BB: <strong>{{ rm.berat_badan }}kg</strong></div>
+              <div class="me-2">TB: <strong>{{ rm.tinggi_badan }}cm</strong></div>
+              <div>Nadi: <strong>{{ rm.nadi }}bpm</strong></div>
+            </div>
+
+            <div>
+              <span class="text-muted small d-block fw-semibold mb-1">Resep & Terapi Obat:</span>
+              <div class="p-2 bg-white border rounded font-monospace small" style="white-space: pre-line;">{{ rm.resep_obat or '-' }}</div>
+            </div>
+
+            {% if rm.catatan_dokter %}
+              <div class="mt-2">
+                <span class="text-muted small d-block">Catatan / Edukasi:</span>
+                <small class="text-dark">{{ rm.catatan_dokter }}</small>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="card-custom p-5 text-center text-muted">
+      <i class="bi bi-journal-x fs-1 d-block text-secondary opacity-50 mb-2"></i>
+      Belum ada riwayat rekam medis tercatat untuk pasien ini.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
